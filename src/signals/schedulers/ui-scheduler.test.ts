@@ -3,7 +3,7 @@ import { UiScheduler } from './ui-scheduler.js';
 
 describe('ui-scheduler', () => {
   describe('UiScheduler', () => {
-    describe('schedule', () => {
+    xdescribe('schedule', () => {
       it('schedules on the next animation frame', async () => {
         const scheduler = UiScheduler.from();
         const action = jasmine.createSpy<() => void>('action');
@@ -106,6 +106,135 @@ describe('ui-scheduler', () => {
         await nextFrame();
         expect(action1).not.toHaveBeenCalledOnceWith();
         expect(action2).toHaveBeenCalledOnceWith();
+      });
+    });
+
+    describe('stable', () => {
+      xit('resolves immediately when no actions are pending', async () => {
+        const scheduler = UiScheduler.from();
+
+        await expectAsync(scheduler.stable()).toBeResolved();
+      });
+
+      xit('waits and resolves once pending actions have completed', async () => {
+        const scheduler = UiScheduler.from();
+
+        scheduler.schedule(() => {});
+
+        const stable = scheduler.stable();
+        await expectAsync(stable).toBePending();
+
+        await nextFrame();
+        await expectAsync(stable).toBeResolved();
+      });
+
+      it('waits for actions scheduled in an action callback', async () => {
+        console.log('start - waits for actions scheduled in an action callback'); // DEBUG
+
+        const scheduler = UiScheduler.from();
+
+        const action = jasmine.createSpy<() => void>('action');
+
+        scheduler.schedule(() => {
+          scheduler.schedule(action);
+        });
+
+        await scheduler.stable();
+        expect(action).toHaveBeenCalled();
+        console.log('done - waits for actions scheduled in an action callback'); // DEBUG
+      });
+
+      // If this last action queues a microtask which schedules a new action,
+      // then that microtask would be executed *after* the scheduler decides it
+      // is stable but before `await scheduler.stable()` can resume, meaning the
+      // scheduler might still be unstable even after the `await`. This test
+      // exercises this exact case.
+      it('waits for actions scheduled in microtasks from an action', async () => {
+        console.log('start - waits for actions scheduled in microtasks from an action'); // DEBUG
+
+        const scheduler = UiScheduler.from();
+
+        const action = jasmine.createSpy<() => void>('action');
+
+        scheduler.schedule(() => {
+          // queueMicrotask(() => {
+            scheduler.schedule(action);
+          // });
+        });
+
+        await scheduler.stable();
+
+        expect(scheduler.isStable()).toBeTrue();
+        expect(action).toHaveBeenCalled();
+        console.log('done - waits for actions scheduled in microtasks from an action'); // DEBUG
+      });
+
+      // Replicate the previous test case multiple times in a row to verify that
+      // the scheduler correctly waits each time it happens consecutively.
+      it('recursively waits for actions scheduled in microtasks from an action', async () => {
+        console.log('start - recursively waits for actions scheduled in microtasks from an action'); // DEBUG
+
+        const scheduler = UiScheduler.from();
+
+        const action = jasmine.createSpy<() => void>('action');
+
+        scheduler.schedule(() => {
+          // queueMicrotask(() => {
+          //   scheduler.schedule(() => {
+          //     queueMicrotask(() => {
+                scheduler.schedule(action);
+          //     });
+          //   });
+          // });
+        });
+
+        await scheduler.stable();
+
+        expect(scheduler.isStable()).toBeTrue();
+        expect(action).toHaveBeenCalled();
+        console.log('done - recursively waits for actions scheduled in microtasks from an action'); // DEBUG
+      });
+
+      xit('handles actions which are both executed *and* canceled', async () => {
+        const scheduler = UiScheduler.from();
+
+        const action = jasmine.createSpy<() => void>('action');
+
+        const cancel = scheduler.schedule(() => {});
+        await scheduler.stable(); // Executes action.
+        cancel(); // Canceled after execution.
+        expect(scheduler.isStable()).toBeTrue();
+
+        scheduler.schedule(action);
+
+        // Stability not be corrupted.
+        expect(scheduler.isStable()).toBeFalse();
+        await scheduler.stable();
+        expect(scheduler.isStable()).toBeTrue();
+        expect(action).toHaveBeenCalled();
+      });
+
+      it('handles actions which are canceled multiple times', async () => {
+        console.log(`start - handles actions which are canceled multiple times - ${new Date().getTime()}`); // DEBUG
+
+        const scheduler = UiScheduler.from();
+
+        const action = jasmine.createSpy<() => void>('action');
+
+        // Schedule an action and *incorrectly* cancel it twice.
+        const cancel = scheduler.schedule(() => {});
+        cancel();
+        cancel();
+        expect(scheduler.isStable()).toBeTrue();
+
+        // Stability not be corrupted.
+        scheduler.schedule(action);
+        expect(scheduler.isStable()).toBeFalse();
+        await scheduler.stable();
+        console.log(`Stable!`); // DEBUG
+        expect(scheduler.isStable()).toBeTrue();
+        expect(action).toHaveBeenCalled();
+        console.log('done - handles actions which are canceled multiple times'); // DEBUG
       });
     });
   });

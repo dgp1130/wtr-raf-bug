@@ -158,6 +158,7 @@ describe('hydroactive-component', () => {
       it('registers the connect and disconnect hooks', () => {
         const onConnect = jasmine.createSpy<OnConnect>('onConnect');
         const onDisconnect = jasmine.createSpy<OnDisconnect>('onDisconnect');
+        const stable = () => Promise.resolve();
 
         customElements.define(
           'lifecycle-comp',
@@ -168,7 +169,7 @@ describe('hydroactive-component', () => {
 
         const comp =
             document.createElement('lifecycle-comp') as HydroActiveComponent;
-        comp._registerLifecycleHooks({ onConnect, onDisconnect });
+        comp._registerLifecycleHooks({ onConnect, onDisconnect, stable });
         expect(onConnect).not.toHaveBeenCalled();
         expect(onDisconnect).not.toHaveBeenCalled();
 
@@ -190,6 +191,7 @@ describe('hydroactive-component', () => {
         const onDisconnect1 = jasmine.createSpy<OnDisconnect>('onDisconnect1');
         const onConnect2 = jasmine.createSpy<OnConnect>('onConnect2');
         const onDisconnect2 = jasmine.createSpy<OnDisconnect>('onDisconnect2');
+        const stable = () => Promise.resolve();
 
         customElements.define(
           'multi-lifecycle-comp',
@@ -204,6 +206,7 @@ describe('hydroactive-component', () => {
         comp._registerLifecycleHooks({
           onConnect: onConnect1,
           onDisconnect: onDisconnect1,
+          stable,
         });
         expect(onConnect1).not.toHaveBeenCalled();
         expect(onDisconnect1).not.toHaveBeenCalled();
@@ -211,6 +214,7 @@ describe('hydroactive-component', () => {
         comp._registerLifecycleHooks({
           onConnect: onConnect2,
           onDisconnect: onDisconnect2,
+          stable,
         });
         expect(onConnect2).not.toHaveBeenCalled();
         expect(onDisconnect2).not.toHaveBeenCalled();
@@ -235,12 +239,13 @@ describe('hydroactive-component', () => {
 
       it('does not invoke connect listeners added during hydration', () => {
         const onConnect = jasmine.createSpy<OnConnect>('onConnect');
+        const stable = () => Promise.resolve();
 
         customElements.define(
           'hydration-connect',
           class extends HydroActiveComponent {
             override hydrate(): void {
-              this._registerLifecycleHooks({ onConnect });
+              this._registerLifecycleHooks({ onConnect, stable });
             }
           },
         );

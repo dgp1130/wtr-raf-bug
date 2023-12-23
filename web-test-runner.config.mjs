@@ -1,5 +1,6 @@
-import * as fs from 'fs';
-import { createRequire } from 'module';
+import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
+import * as wtr from '@web/test-runner';
 
 const require = createRequire(import.meta.url);
 const jasminePath = require.resolve('jasmine-core/lib/jasmine-core/jasmine.js');
@@ -22,6 +23,7 @@ const testFramework = {
     defaultTimeoutInterval: 1_000,
     failSpecWithNoExpectations: true,
     autoCleanClosures: true,
+    seed: 27656,
   },
 };
 
@@ -36,9 +38,12 @@ const jasminePlugin = {
   },
 };
 
+/** @type {wtr.TestRunnerConfig} */
 export default {
   testFramework,
   rootDir: 'dist/',
   nodeResolve: true,
   plugins: [ jasminePlugin ],
+  concurrency: 2,
+  concurrentBrowsers: 1,
 };

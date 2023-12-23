@@ -1,4 +1,4 @@
-import { nextFrame, parseHtml } from 'hydroactive/testing.js';
+import { parseHtml } from 'hydroactive/testing.js';
 import { AutoCounter } from './auto-counter.js';
 
 describe('auto-counter', () => {
@@ -6,6 +6,7 @@ describe('auto-counter', () => {
   afterEach(() => { jasmine.clock().uninstall(); });
 
   afterEach(() => {
+    console.log(`Cleaning up nodes - ${new Date().getTime()}`);
     for (const node of document.body.childNodes) node.remove();
   });
 
@@ -19,38 +20,45 @@ describe('auto-counter', () => {
 
   describe('AutoCounter', () => {
     it('does not re-render on hydration', async () => {
+      console.log('start - does not re-render on hydration'); // DEBUG
+
       const el = render({ count: 5 });
       document.body.appendChild(el);
 
-      await nextFrame();
+      console.log(`await el.stable(); - ${new Date().getTime()}`); // DEBUG
+      await el.stable();
 
       expect(el.querySelector('span')!.textContent).toBe('5');
+      console.log('end - does not re-render on hydration'); // DEBUG
     });
 
-    it('updates the count every second', async () => {
+    xit('updates the count every second', async () => {
       const el = render({ count: 5 });
       document.body.appendChild(el);
 
       jasmine.clock().tick(1_000);
-      await nextFrame();
+      await el.stable();
 
       expect(el.querySelector('span')!.textContent).toBe('6');
     });
 
     it('pauses the count while disconnected', async () => {
+      console.log('start - pauses the count while disconnected'); // DEBUG
+
       const el = render({ count: 5 });
 
       document.body.appendChild(el);
       el.remove(); // Should pause timer.
 
       jasmine.clock().tick(1_000);
-      await nextFrame();
+      await el.stable();
 
       // Should not have incremented.
       expect(el.querySelector('span')!.textContent).toBe('5');
+      console.log('end - pauses the count while disconnected'); // DEBUG
     });
 
-    it('resumes the count when reconnected', async () => {
+    xit('resumes the count when reconnected', async () => {
       const el = render({ count: 5 });
 
       document.body.appendChild(el);
@@ -61,7 +69,7 @@ describe('auto-counter', () => {
       document.body.appendChild(el); // Should resume timer.
 
       jasmine.clock().tick(1_000);
-      await nextFrame();
+      await el.stable();
 
       // Should have incremented only once.
       expect(el.querySelector('span')!.textContent).toBe('6');

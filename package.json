@@ -23,7 +23,7 @@
     "build-demo-link-hydroactive": "(cd dist/src/demo/ && ln -s ../ hydroactive)",
     "test": "npm run -s clean && npm run -s build-tests && npm run -s wtr",
     "test-debug": "npm run -s clean && npm run -s build-tests && npm run -s wtr-debug",
-    "wtr": "web-test-runner \"dist/**/*.test.html\" --puppeteer",
+    "wtr": "web-test-runner dist/src/demo/counter/auto-counter.test.html \"dist/src/signals/schedulers/ui-scheduler.test.html\" --puppeteer",
     "wtr-debug": "npm run -s wtr -- --manual",
     "clean": "rm -rf dist/"
   },

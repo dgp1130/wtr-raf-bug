@@ -65,7 +65,8 @@ jasmineEnv.addReporter({
   },
 
   async jasmineDone(result) {
-    console.log(`Tests ${result.overallStatus}!`);
+    console.log(`Tests ${result.overallStatus} with seed ${
+        result.order.seed}!`);
     await sessionFinished({
       passed: result.overallStatus === 'passed',
       errors: failedSpecs,

@@ -9,15 +9,24 @@ export abstract class HydroActiveComponent extends HTMLElement {
   /** Listeners to invoke when disconnected from the DOM. */
   readonly #disconnectListeners: Array<() => void> = [];
 
+  /** TODO */
+  public stable!: () => Promise<void>;
+
   /** User-defined lifecycle hook invoked on hydration. */
   protected abstract hydrate(): void;
 
-  public /* internal */ _registerLifecycleHooks({ onConnect, onDisconnect }: {
+  public /* internal */ _registerLifecycleHooks({
+    onConnect,
+    onDisconnect,
+    stable,
+  }: {
     onConnect?: () => void,
     onDisconnect?: () => void,
+    stable: () => Promise<void>,
   }): void {
     if (onConnect) this.#connectListeners.push(onConnect);
     if (onDisconnect) this.#disconnectListeners.push(onDisconnect);
+    this.stable = stable;
   }
 
   connectedCallback(): void {

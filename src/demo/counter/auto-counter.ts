@@ -1,11 +1,20 @@
-import { HydroActiveComponent } from '../../hydroactive-component.js';
-import { ComponentRef, ElementRef } from 'hydroactive';
+import { UiScheduler } from '../../signals/schedulers/ui-scheduler.js';
 
 /** Automatically increments the count over time. */
-const AutoCounter = class extends HydroActiveComponent {
-  override hydrate(): void {
-    const comp = ComponentRef._from(ElementRef.from(this));
-    comp.live('span', Number);
+class AutoCounter extends HTMLElement {
+  private readonly scheduler = UiScheduler.from();
+  private disposeEffect!: () => void;
+
+  connectedCallback(): void {
+    this.disposeEffect = this.scheduler.schedule(() => { });
+  }
+
+  disconnectedCallback(): void {
+    this.disposeEffect();
+  }
+
+  public stable(): Promise<void> {
+    return this.scheduler.stable();
   }
 };
 

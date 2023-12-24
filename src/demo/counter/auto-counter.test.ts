@@ -2,9 +2,7 @@ import './auto-counter.js';
 
 function render({ count }: { count: number }) {
   const autoCounter = document.createElement('auto-counter');
-  const span = document.createElement('span');
-  span.textContent = count.toString();
-  autoCounter.appendChild(span);
+  autoCounter.textContent = count.toString();
   return autoCounter;
 }
 

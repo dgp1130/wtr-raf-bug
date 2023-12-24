@@ -1,19 +1,15 @@
-import { defineComponent } from 'hydroactive';
+import { HydroActiveComponent } from '../../hydroactive-component.js';
+import { ComponentRef, ElementRef } from 'hydroactive';
 
 /** Automatically increments the count over time. */
-export const AutoCounter = defineComponent('auto-counter', (comp) => {
-  const count = comp.live('span', Number);
+const AutoCounter = class extends HydroActiveComponent {
+  override hydrate(): void {
+    const comp = ComponentRef._from(ElementRef.from(this));
+    comp.live('span', Number);
+  }
+};
 
-  comp.connected(() => {
-    const id = setInterval(() => {
-      count.set(count() + 1);
-    }, 1_000);
-
-    return () => {
-      clearInterval(id);
-    };
-  });
-});
+customElements.define('auto-counter', AutoCounter);
 
 declare global {
   interface HTMLElementTagNameMap {

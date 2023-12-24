@@ -87,6 +87,6 @@ export class UiScheduler implements Scheduler {
     // but before `await this.stablePromise` resumes. Therefore the scheduler
     // can still be in an unstable state, so we check to be sure and re-await to
     // be stable if a new action was added.
-    // if (!this.isStable()) await this.stable();
+    if (!this.isStable()) await this.stable();
   }
 }

@@ -19,11 +19,6 @@ export function defineComponent(tagName: string, hydrate: HydrateLifecycle):
     }
   };
 
-  // Set `name` for improved debug-ability.
-  Object.defineProperty(Component, 'name', {
-    value: skewerCaseToPascalCase(tagName),
-  });
-
   customElements.define(tagName, Component);
 
   return Component;
@@ -34,9 +29,3 @@ export function defineComponent(tagName: string, hydrate: HydrateLifecycle):
  * instance type.
  */
 type Class<Instance> = { new(): Instance };
-
-function skewerCaseToPascalCase(skewerCase: string): string {
-  return skewerCase.split('-')
-      .map((word) => `${word[0]?.toUpperCase() ?? ''}${word.slice(1)}`)
-      .join('');
-}

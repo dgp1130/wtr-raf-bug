@@ -30,8 +30,8 @@
   "license": "MIT",
   "devDependencies": {
     "@types/jasmine": "^4.3.1",
-    "@web/test-runner": "^0.15.3",
-    "@web/test-runner-puppeteer": "^0.14.2",
+    "@web/test-runner": "^0.18.0",
+    "@web/test-runner-puppeteer": "^0.15.0",
     "http-server": "^14.1.1",
     "jasmine-core": "^4.5.0",
     "typescript": "^5.3.3"
@@ -41,5 +41,8 @@
     "/*.d.ts",
     "/*.js.map",
     "/*.d.ts.map"
-  ]
+  ],
+  "overrides": {
+    "puppeteer": "^21.6.1"
+  }
 }

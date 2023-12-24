@@ -1,8 +1,5 @@
 /** Abstract base class for all HydroActive components. */
 export abstract class HydroActiveComponent extends HTMLElement {
-  /** Whether or not the component has been hydrated. */
-  #hydrated = false;
-
   /** Listeners to invoke when connected to the DOM. */
   readonly #connectListeners: Array<() => void> = [];
 
@@ -35,31 +32,10 @@ export abstract class HydroActiveComponent extends HTMLElement {
     // discovered post-connection time, such as during hydration.
     for (const listener of this.#connectListeners) listener();
 
-    this.#requestHydration();
+    this.hydrate();
   }
 
   disconnectedCallback(): void {
     for (const listener of this.#disconnectListeners) listener();
-  }
-
-  // Trigger hydration when the `defer-hydration` attribute is removed.
-  static get observedAttributes(): string[] { return ['defer-hydration']; }
-  attributeChangedCallback(
-    name: string,
-    _oldValue: string | null,
-    newValue: string | null,
-  ): void {
-    if (name === 'defer-hydration' && newValue === null) {
-      this.#requestHydration();
-    }
-  }
-
-  /** Hydrates the component if not already hydrated. Otherwise does nothing. */
-  #requestHydration(): void {
-    if (this.#hydrated) return;
-    if (this.hasAttribute('defer-hydration')) return;
-
-    this.#hydrated = true;
-    this.hydrate();
   }
 }

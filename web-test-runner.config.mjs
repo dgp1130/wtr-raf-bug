@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
 import { createRequire } from 'node:module';
-import * as wtr from '@web/test-runner';
+import { puppeteerLauncher } from '@web/test-runner-puppeteer';
 
 const require = createRequire(import.meta.url);
 const jasminePath = require.resolve('jasmine-core/lib/jasmine-core/jasmine.js');
@@ -38,7 +38,7 @@ const jasminePlugin = {
   },
 };
 
-/** @type {wtr.TestRunnerConfig} */
+/** @type {import('@web/test-runner').TestRunnerConfig} */
 export default {
   testFramework,
   rootDir: 'dist/',
@@ -46,4 +46,7 @@ export default {
   plugins: [ jasminePlugin ],
   concurrency: 2,
   concurrentBrowsers: 1,
+  browsers: [
+    puppeteerLauncher(),
+  ],
 };

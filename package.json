@@ -25,6 +25,7 @@
     "test-debug": "npm run -s clean && npm run -s build-tests && npm run -s wtr-debug",
     "wtr": "web-test-runner dist/src/1.test.html dist/src/2.test.html",
     "wtr-debug": "npm run -s wtr -- --manual",
+    "puppeteer": "npm run -s build-tests && node puppeteer.mjs",
     "clean": "rm -rf dist/"
   },
   "license": "MIT",
